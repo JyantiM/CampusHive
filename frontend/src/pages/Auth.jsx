@@ -49,9 +49,7 @@ const Auth = ({ onAuthSuccess }) => {
       }
     } catch (error) {
       console.error(error);
-      // DEBUG: Show actual URL being called and error details
-      const debugInfo = `\nDEBUG: baseURL = ${api.defaults.baseURL}\nError: ${error.message}\nResponse: ${JSON.stringify(error.response?.data || 'No response (network error)')}`;
-      alert((error.response?.data?.message || 'Failed to dispatch verification OTP.') + debugInfo);
+      alert(error.response?.data?.message || 'Failed to dispatch verification OTP.');
     }
   };
 

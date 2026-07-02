@@ -2,8 +2,18 @@ import axios from 'axios';
 
 // In production (Vercel), VITE_API_URL must be set to the deployed backend URL.
 // Locally it falls back to http://localhost:5000/api
+let backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+// Clean trailing slash
+if (backendUrl.endsWith('/')) {
+  backendUrl = backendUrl.slice(0, -1);
+}
+// Ensure it ends with /api
+if (!backendUrl.endsWith('/api')) {
+  backendUrl += '/api';
+}
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+  baseURL: backendUrl
 });
 
 // Automatically inject JWT token into header
