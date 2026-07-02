@@ -55,16 +55,19 @@ const sendOtpEmail = async (email, otp) => {
       console.error(`   Response: ${error.response}`);
       console.error(`   Check   : Is Gmail App Password correct? Is 2FA enabled on your Google account?`);
       console.error(`   Email Used: ${process.env.EMAIL_USER}\n`);
-      // Fallback to console print if SMTP fails
+      // Re-throw so the caller (authController) properly reports the failure to the user
+      throw new Error(`Failed to dispatch verification OTP. Please try again or contact support. (${error.message})`);
     }
   }
 
-  // Console printing simulator mode
+  // ── Local dev fallback ──────────────────────────────────────────────────────
+  // SMTP credentials are NOT set → print OTP to server console (local dev only)
   console.log(`
 ============================================================
-  [SIMULATED NODEMAILER OTP SERVICE]
+  [LOCAL DEV - SIMULATED OTP SERVICE]
   Recipient Email : ${email}
   Verification OTP: ${otp}
+  (Set EMAIL_USER + EMAIL_PASS in .env to send real emails)
 ============================================================
   `);
   return { success: true, simulated: true };

@@ -41,7 +41,8 @@ const FilePreview = ({ title, filename, fileUrl, onDownload }) => {
     if (!url) return url;
     // Cloudinary PDF block bypass: proxy through our backend
     if (url.includes('cloudinary.com')) {
-      return `http://localhost:5000/api/materials/proxy?url=${encodeURIComponent(url)}`;
+      const backendBase = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+      return `${backendBase}/materials/proxy?url=${encodeURIComponent(url)}`;
     }
     return url;
   };
