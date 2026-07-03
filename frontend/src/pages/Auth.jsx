@@ -17,6 +17,7 @@ const Auth = ({ onAuthSuccess }) => {
   // OTP Verification flow
   const [otpSent, setOtpSent] = useState(false);
   const [otpInput, setOtpInput] = useState('');
+  const [isSendingOtp, setIsSendingOtp] = useState(false);
 
   const validateCollegeEmail = (emailStr) => {
     const normalized = emailStr.toLowerCase().trim();
@@ -34,6 +35,7 @@ const Auth = ({ onAuthSuccess }) => {
       return;
     }
 
+    setIsSendingOtp(true);
     try {
       const res = await api.post('/auth/send-otp', {
         name,
@@ -41,15 +43,17 @@ const Auth = ({ onAuthSuccess }) => {
         branch,
         year,
         password
-      });
+      }, { timeout: 180000 });
 
       if (res.data.success) {
         setOtpSent(true);
-        alert('Verification OTP code sent to your email. Check your inbox (or simulated console output).');
+        alert('Verification OTP code sent to your email. Check your inbox.');
       }
     } catch (error) {
       console.error(error);
-      alert(error.response?.data?.message || 'Failed to dispatch verification OTP.');
+      alert(error.response?.data?.message || 'Failed to dispatch verification OTP. Please try again.');
+    } finally {
+      setIsSendingOtp(false);
     }
   };
 
@@ -214,10 +218,20 @@ const Auth = ({ onAuthSuccess }) => {
 
               <button
                 type="submit"
-                className="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-sm transition shadow-md shadow-amber-500/10 flex items-center justify-center gap-1.5"
+                disabled={isSendingOtp}
+                className={`w-full py-2.5 rounded-xl text-slate-950 font-extrabold text-sm transition shadow-md shadow-amber-500/10 flex items-center justify-center gap-1.5 ${isSendingOtp ? 'bg-amber-600 opacity-70 cursor-not-allowed' : 'bg-amber-500 hover:bg-amber-600'}`}
               >
-                <UserPlus className="w-4 h-4" />
-                <span>Send Verification OTP</span>
+                {isSendingOtp ? (
+                  <>
+                    <svg className="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                    <span>Sending OTP... (this may take up to 1 min)</span>
+                  </>
+                ) : (
+                  <>
+                    <UserPlus className="w-4 h-4" />
+                    <span>Send Verification OTP</span>
+                  </>
+                )}
               </button>
             </form>
           ) : (
