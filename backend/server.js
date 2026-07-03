@@ -71,6 +71,10 @@ cron.schedule('0 0 * * 1', async () => {
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`Server executing in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
-});
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`Server executing in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+  });
+}
+
+module.exports = app;
