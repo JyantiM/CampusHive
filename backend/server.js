@@ -57,17 +57,19 @@ app.get('/', (req, res) => {
 });
 
 // Reset weekly trending counters every Monday at 00:00 (Midnight)
-cron.schedule('0 0 * * 1', async () => {
-  console.log('[Cron Job]: Resetting weekly trending metrics...');
-  try {
-    const noteRes = await Note.updateMany({}, { weeklyDownloads: 0 });
-    const pyqRes = await PYQ.updateMany({}, { weeklyDownloads: 0 });
-    const quizRes = await Quiz.updateMany({}, { weeklyAttempts: 0 });
-    console.log(`[Cron Job Success]: Note: ${noteRes.modifiedCount}, PYQ: ${pyqRes.modifiedCount}, Quiz: ${quizRes.modifiedCount} records reset.`);
-  } catch (error) {
-    console.error(`[Cron Job Failure]: ${error.message}`);
-  }
-});
+if (process.env.NODE_ENV !== 'production') {
+  cron.schedule('0 0 * * 1', async () => {
+    console.log('[Cron Job]: Resetting weekly trending metrics...');
+    try {
+      const noteRes = await Note.updateMany({}, { weeklyDownloads: 0 });
+      const pyqRes = await PYQ.updateMany({}, { weeklyDownloads: 0 });
+      const quizRes = await Quiz.updateMany({}, { weeklyAttempts: 0 });
+      console.log(`[Cron Job Success]: Note: ${noteRes.modifiedCount}, PYQ: ${pyqRes.modifiedCount}, Quiz: ${quizRes.modifiedCount} records reset.`);
+    } catch (error) {
+      console.error(`[Cron Job Failure]: ${error.message}`);
+    }
+  });
+}
 
 const PORT = process.env.PORT || 5000;
 
